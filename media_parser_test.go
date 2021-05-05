@@ -15,18 +15,8 @@ func TestWebpMediaParser_ParseBytes(t *testing.T) {
 
 	filepath := GetTestImageFilepath()
 
-	// f, err := os.Open(filepath)
-	// log.PanicIf(err)
-
-	// defer f.Close()
-
 	data, err := ioutil.ReadFile(filepath)
 	log.PanicIf(err)
-
-	// f, err := os.Open(filepath)
-	// log.PanicIf(err)
-
-	// defer f.Close()
 
 	mc, err := wmp.ParseBytes(data)
 	log.PanicIf(err)
