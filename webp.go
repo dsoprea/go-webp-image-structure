@@ -10,18 +10,25 @@ import (
 )
 
 var (
+	// ErrNoRiffFileHeader indicates that the file-header failed.
 	ErrNoRiffFileHeader = errors.New("not on a RIFF file-header")
-	ErrNoWebpSignature  = errors.New("not a WEBP file")
+
+	// ErrNoWebpSignature indicates that the WEBP signature following the file-
+	// header failed.
+	ErrNoWebpSignature = errors.New("not a WEBP file")
 )
 
 var (
+	// DefaultEndianness is the endianness of a standard RIFF stream.
 	DefaultEndianness = binary.LittleEndian
 )
 
+// WebpParser parses WEBP RIFF streams.
 type WebpParser struct {
 	r io.Reader
 }
 
+// NewWebpParser returns a WebpParser.
 func NewWebpParser(r io.Reader) *WebpParser {
 	return &WebpParser{
 		r: r,
@@ -33,6 +40,7 @@ var (
 	webpBytes           = [4]byte{'W', 'E', 'B', 'P'}
 )
 
+// readHeader returns the file-header if we're sitting on the first byte.
 func (wp *WebpParser) readHeader() (fileSize int64, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -63,6 +71,8 @@ func (wp *WebpParser) readHeader() (fileSize int64, err error) {
 	return int64(fileSizeRaw), nil
 }
 
+// readChunkHeader returns the chunk-information if we're sitting on the first
+// byte of a chunk.
 func (wp *WebpParser) readChunkHeader() (fourCc [4]byte, chunkSize int64, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -80,9 +90,14 @@ func (wp *WebpParser) readChunkHeader() (fourCc [4]byte, chunkSize int64, err er
 	return fourCc, int64(chunkSizeRaw), nil
 }
 
+// DataGetterFunc is a lazy-getter for the payload data.
 type DataGetterFunc func() (data []byte, err error)
+
+// ChunkVisitorFunc is a callback that receives each chunk.
 type ChunkVisitorFunc func(fourCc [4]byte, dataGetter DataGetterFunc) (err error)
 
+// enumerateChunks enumerates each sequential chunk. Takes an optional callback
+// (if no callback is given, execution essentially becomes simple validation).
 func (wp *WebpParser) enumerateChunks(chunkVisitorCb ChunkVisitorFunc) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
