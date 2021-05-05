@@ -1,0 +1,15 @@
+language: go
+go:
+  - master
+  - stable
+  - "1.16"
+  - "1.15"
+  - "1.14"
+env:
+  - GO111MODULE=on
+install:
+  - go get -t ./...
+script:
+  - go test -v ./... -coverprofile=coverage.txt -covermode=atomic
+after_success:
+  - curl -s https://codecov.io/bash | bash
