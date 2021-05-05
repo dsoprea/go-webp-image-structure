@@ -9,10 +9,6 @@ import (
 	"github.com/dsoprea/go-logging/v2"
 )
 
-var (
-	exifFourCc = [4]byte{'E', 'X', 'I', 'F'}
-)
-
 func TestWebpParser_readHeader(t *testing.T) {
 	filepath := GetTestImageFilepath()
 

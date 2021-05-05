@@ -23,6 +23,12 @@ var (
 	DefaultEndianness = binary.LittleEndian
 )
 
+var (
+	riffFileHeaderBytes = [4]byte{'R', 'I', 'F', 'F'}
+	webpBytes           = [4]byte{'W', 'E', 'B', 'P'}
+	exifFourCc          = [4]byte{'E', 'X', 'I', 'F'}
+)
+
 // WebpParser parses WEBP RIFF streams.
 type WebpParser struct {
 	r io.Reader
@@ -34,11 +40,6 @@ func NewWebpParser(r io.Reader) *WebpParser {
 		r: r,
 	}
 }
-
-var (
-	riffFileHeaderBytes = [4]byte{'R', 'I', 'F', 'F'}
-	webpBytes           = [4]byte{'W', 'E', 'B', 'P'}
-)
 
 // readHeader returns the file-header if we're sitting on the first byte.
 func (wp *WebpParser) readHeader() (fileSize int64, err error) {
